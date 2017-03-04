@@ -1,40 +1,52 @@
 //https://github.com/shellus/angular-MQTT
+//https://github.com/pablojim/highcharts-ng
 
-var app = angular.module('myapp', ['ngMQTT']);
+
+
+var app = angular.module('myapp', ['ngMQTT','highcharts-ng']);
 app.config(['MQTTProvider', function (MQTTProvider) {
-    MQTTProvider.setHref('ws://cv.endaosi.com:18585');
+    MQTTProvider.setHref('ws://localhost:3000');
 }]);
-app.controller('indexCtrl', ['$scope', 'MQTTService', function ($scope, MQTTService) {
-    MQTTService.on('hello', function (data) {
-        alert(data)
-    });
-    MQTTService.send('hello', 'word');
-    MQTTService.send('hello', 'word1');
-    MQTTService.send('hello', 'word2');
-}]);
-
-$(function () { 
-    var myChart = Highcharts.chart('container', {
+app.controller('myctrl', ['$scope', 'MQTTService', function ($scope, MQTTService) {
+    
+    
+    $scope.chartConfig = {
         chart: {
             type: 'bar'
         },
         title: {
-            text: 'Fruit Consumption'
+            text: 'Engine Data'
         },
         xAxis: {
-            categories: ['Apples', 'Bananas', 'Oranges']
+            categories: ['RPM', 'Temp', 'Gear']
         },
         yAxis: {
             title: {
-                text: 'Fruit eaten'
+                text: 'VigoLabs Engine'
             }
         },
         series: [{
-            name: 'Jane',
-            data: [1, 0, 4]
-        }, {
-            name: 'John',
-            data: [5, 7, 3]
-        }]
+                    data: [0,0,0],
+                    id: 'series1'
+                }]
+    };
+    
+    
+    MQTTService.on('m/t/1', function (data) {
+        $scope.chartConfig.series[0].data[0]=data;
     });
-});
+    MQTTService.on('m/t/2', function (data) {
+        $scope.chartConfig.series[0].data[1]=data;
+    });
+    MQTTService.on('m/t/3', function (data) {
+        $scope.chartConfig.series[0].data[2]=data;
+    });
+
+    
+    //MQTTService.send('hello/world', 3);
+    //MQTTService.send('hello/world', 2);
+    //MQTTService.send('hello/world', 4);
+    
+    
+}]);
+
