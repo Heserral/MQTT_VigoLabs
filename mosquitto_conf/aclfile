@@ -1,0 +1,5 @@
+user vigo
+topic readwrite a/b/c
+
+user user
+topic read a/b/c
